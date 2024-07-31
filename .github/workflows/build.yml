@@ -9,7 +9,7 @@ jobs:
         strategy:
             matrix:
                 java: [ 21 ]
-                os: [ windows-latest, macos-latest, macos-latest-large, ubuntu-latest]
+                os: [ ubuntu-latest, windows-latest, macos-latest, macos-latest-large ]
         runs-on: ${{ matrix.os }}
         steps:
             -   name: checkout repository
