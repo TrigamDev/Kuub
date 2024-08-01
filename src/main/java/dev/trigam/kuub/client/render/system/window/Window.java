@@ -1,5 +1,6 @@
 package dev.trigam.kuub.client.render.system.window;
 
+import dev.trigam.kuub.client.render.element.Mesh;
 import dev.trigam.kuub.client.render.system.Renderer;
 import dev.trigam.kuub.color.Color;
 import org.lwjgl.glfw.*;
@@ -20,10 +21,11 @@ public class Window {
     public DisplaySettings displaySettings;
     public long refreshRate;
 
+    private Mesh testMesh;
+
     public Window ( DisplaySettings displaySettings ) {
         this.displaySettings = displaySettings;
     }
-
 
     public void open () throws Throwable {
         if ( !glfwInit() ) throw new IllegalStateException("Unable to initialize GLFW");
@@ -69,21 +71,43 @@ public class Window {
         this.renderer.init();
 
         // Background color
-        Color trigamBlue = Color.fromHex("#3f48cc");
+        Color backgroundColor = Color.fromHex("#1B1725");
         glClearColor(
-            Color.floatFromChannel( trigamBlue.red ),
-            Color.floatFromChannel( trigamBlue.green ),
-            Color.floatFromChannel( trigamBlue.blue ),
-            Color.floatFromChannel( trigamBlue.alpha )
+            Color.floatFromChannel( backgroundColor.red ),
+            Color.floatFromChannel( backgroundColor.green ),
+            Color.floatFromChannel( backgroundColor.blue ),
+            Color.floatFromChannel( backgroundColor.alpha )
         );
+
+        // Test mesh
+        float[] positions = new float[]{
+            -0.5f,  0.5f, 0.0f,
+            -0.5f, -0.5f, 0.0f,
+            0.5f, -0.5f, 0.0f,
+            0.5f,  0.5f, 0.0f,
+        };
+        int[] indices = new int[]{
+            0, 1, 3, 3, 1, 2,
+        };
+        float[] colors = new float[]{
+            0.5f, 0.0f, 0.0f,
+            0.0f, 0.5f, 0.0f,
+            0.0f, 0.0f, 0.5f,
+            0.0f, 0.5f, 0.5f,
+        };
+        this.testMesh = new Mesh( positions, indices, colors );
     }
 
     public void render () {
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        this.renderer.render();
+        this.renderer.render( this.testMesh );
 
         glfwSwapBuffers( this.window );
         glfwPollEvents();
+    }
+
+    public void close() {
+        this.renderer.cleanUp( this.testMesh );
     }
 }

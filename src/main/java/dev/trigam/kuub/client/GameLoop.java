@@ -84,6 +84,7 @@ public abstract class GameLoop {
 
     public void close () {
         this.running = false;
+        this.window.close();
     }
 
     public abstract void tick();
