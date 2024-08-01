@@ -1,5 +1,6 @@
 package dev.trigam.kuub.client.render.system.window;
 
+import dev.trigam.kuub.client.render.system.Renderer;
 import dev.trigam.kuub.color.Color;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -14,6 +15,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 public class Window {
     public long window;
+    public Renderer renderer;
 
     public DisplaySettings displaySettings;
     public long refreshRate;
@@ -23,7 +25,7 @@ public class Window {
     }
 
 
-    public void open () {
+    public void open () throws Throwable {
         if ( !glfwInit() ) throw new IllegalStateException("Unable to initialize GLFW");
 
         // Configure GLFW
@@ -62,6 +64,10 @@ public class Window {
 
         GL.createCapabilities();
 
+        // Renderer
+        this.renderer = new Renderer( this );
+        this.renderer.init();
+
         // Background color
         Color trigamBlue = Color.fromHex("#3f48cc");
         glClearColor(
@@ -74,6 +80,9 @@ public class Window {
 
     public void render () {
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+        this.renderer.render();
+
         glfwSwapBuffers( this.window );
         glfwPollEvents();
     }

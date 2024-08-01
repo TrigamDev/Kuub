@@ -4,7 +4,7 @@ plugins {
 
 group = 'dev.trigam'
 version = 'ALPHA-0.0.1'
-project.ext.lwjglVersion = "3.3.3"
+project.ext.lwjglVersion = "3.3.4"
 project.ext.lwjglNatives = "natives-windows"
 
 repositories {

@@ -16,7 +16,6 @@ import java.io.FileNotFoundException;
 import java.util.Optional;
 
 public class Client extends GameLoop {
-    public Renderer renderer;
     public static final Logger log = LogManager.getLogger(Client.class);
 
     public boolean running = false;
@@ -27,24 +26,21 @@ public class Client extends GameLoop {
 
     public void run () throws Throwable {
         // Open window
-        String title = String.format("Kuub | %s %o.%o", GameVersion.phase, GameVersion.major, GameVersion.minor);
+        String title = String.format( "Kuub | %s %o.%o", GameVersion.phase, GameVersion.major, GameVersion.minor );
         log.info(title);
         DisplaySettings displaySettings = new DisplaySettings(
             1920, 1080, title,
             DisplayMode.WINDOWED, 0
         );
-        this.window = new Window(displaySettings);
+        this.window = new Window( displaySettings );
         this.window.open();
 
-        // Start
-        this.renderer = new Renderer(this.window);
-        this.renderer.init();
         start();
     }
 
     public void tick () { }
 
     public void render () {
-        if ( this.renderer != null ) this.renderer.render();
+        if ( this.window != null ) this.window.render();
     }
 }
