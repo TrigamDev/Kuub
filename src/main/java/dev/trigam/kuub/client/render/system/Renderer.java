@@ -28,6 +28,9 @@ public class Renderer {
     }
 
     public void init() throws Throwable {
+        // Config
+        glEnable( GL_DEPTH_TEST );
+
         // Fetch shaders
         Optional<String> vertexShader = FileLoader.loadTextBasedResource(
             ResourceType.ASSET, new Identifier( "shader/vertex/vertex.glsl" )

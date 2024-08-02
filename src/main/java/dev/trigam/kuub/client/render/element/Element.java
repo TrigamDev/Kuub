@@ -59,4 +59,13 @@ public class Element {
     public Vector3f getRotation () { return this.rotation; }
     public float getScale () { return this.scale; }
 
+    public Element copy () {
+        Element faker = new Element( this.mesh );
+        faker.setPosition( this.position.x, this.position.y, this.position.z );
+        faker.setRotation( this.rotation.x, this.rotation.y, this.rotation.z );
+        faker.setScale( this.scale );
+
+        return faker;
+    }
+
 }

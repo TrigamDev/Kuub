@@ -3,12 +3,14 @@ package dev.trigam.kuub.client.render.system.window;
 import dev.trigam.kuub.client.render.element.Element;
 import dev.trigam.kuub.client.render.element.Mesh;
 import dev.trigam.kuub.client.render.system.Renderer;
+import dev.trigam.kuub.client.render.system.scene.Scene;
 import dev.trigam.kuub.color.Color;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.system.*;
 
 import java.nio.*;
+import java.util.List;
 
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL46.*;
@@ -22,7 +24,7 @@ public class Window {
     public DisplaySettings displaySettings;
     public long refreshRate;
 
-    private Element[] testElements;
+    private Scene scene;
 
     public Window ( DisplaySettings displaySettings ) {
         this.displaySettings = displaySettings;
@@ -79,51 +81,21 @@ public class Window {
             Color.floatFromChannel( backgroundColor.blue ),
             Color.floatFromChannel( backgroundColor.alpha )
         );
-
-        // Test mesh
-        float[] positions = new float[]{
-            -0.5f,  0.5f, -1.05f,
-            -0.5f, -0.5f, -1.05f,
-            0.5f, -0.5f, -1.05f,
-            0.5f,  0.5f, -1.05f,
-        };
-        int[] indices = new int[]{
-            0, 1, 3, 3, 1, 2,
-        };
-        float[] colors = new float[]{
-            0.5f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f,
-            0.0f, 0.0f, 0.5f,
-            0.0f, 0.5f, 0.5f,
-        };
-        Mesh testMesh = new Mesh( positions, indices, colors );
-        Element testElement = new Element( testMesh );
-        //testElement.setX(0.5f);
-        testElement.setZ(-0.5f);
-        //testElement.setRotationY(this.testRot);
-        this.testElements = new Element[]{ testElement };
     }
 
     public void render () throws Exception {
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-
-        this.renderer.render( this.testElements );
+        List< Element > sceneElements = this.scene.getElements();
+        this.renderer.render( sceneElements.toArray( Element[]::new ) );
 
         glfwSwapBuffers( this.window );
         glfwPollEvents();
     }
 
-    int tickCount = 0;
-    public void tick () {
-        float testRot = (float) Math.sin((double) tickCount / 25) * 1.35f;
-        this.testElements[0].setRotationY(testRot);
-        tickCount++;
-    }
+    public void tick () {  }
 
-    public void close() {
-        this.renderer.cleanUp( this.testElements );
-    }
+    public void close() { }
 
     public int getWidth() {
         return this.displaySettings.width;
@@ -131,4 +103,6 @@ public class Window {
     public int getHeight() {
         return this.displaySettings.height;
     }
+
+    public void setScene ( Scene scene ) { this.scene = scene; }
 }
