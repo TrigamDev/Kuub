@@ -20,7 +20,7 @@ public class Client extends GameLoop {
         String title = String.format( "Kuub | %s %o.%o", GameVersion.phase, GameVersion.major, GameVersion.minor );
         log.info(title);
         DisplaySettings displaySettings = new DisplaySettings(
-            1080, 1080, title,
+            1920, 1080, title,
             DisplayMode.WINDOWED, 0
         );
         this.window = new Window( displaySettings );
@@ -29,9 +29,11 @@ public class Client extends GameLoop {
         start();
     }
 
-    public void tick () { }
+    public void tick () {
+        if ( this.window != null ) this.window.tick();
+    }
 
-    public void render () {
+    public void render () throws Exception {
         if ( this.window != null ) this.window.render();
     }
 }

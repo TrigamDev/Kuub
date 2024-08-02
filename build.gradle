@@ -5,6 +5,10 @@ plugins {
 group = 'dev.trigam'
 version = 'ALPHA-0.0.1'
 project.ext.lwjglVersion = "3.3.4"
+project.ext.jomlVersion = "1.10.7"
+project.ext.jomlPrimitivesVersion = "1.10.0"
+project.ext.steamworks4jVersion = "1.9.0"
+project.ext.steamworks4jServerVersion = "1.9.0"
 project.ext.lwjglNatives = "natives-windows"
 
 repositories {
@@ -109,4 +113,9 @@ dependencies {
     runtimeOnly "org.lwjgl:lwjgl-xxhash::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-yoga::$lwjglNatives"
     runtimeOnly "org.lwjgl:lwjgl-zstd::$lwjglNatives"
+
+    implementation "org.joml:joml:${jomlVersion}"
+    implementation "org.joml:joml-primitives:${jomlPrimitivesVersion}"
+    implementation "com.code-disaster.steamworks4j:steamworks4j:${steamworks4jVersion}"
+    implementation "com.code-disaster.steamworks4j:steamworks4j-server:${steamworks4jServerVersion}"
 }

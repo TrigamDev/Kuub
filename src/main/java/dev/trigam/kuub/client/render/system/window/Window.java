@@ -1,5 +1,6 @@
 package dev.trigam.kuub.client.render.system.window;
 
+import dev.trigam.kuub.client.render.element.Element;
 import dev.trigam.kuub.client.render.element.Mesh;
 import dev.trigam.kuub.client.render.system.Renderer;
 import dev.trigam.kuub.color.Color;
@@ -21,7 +22,7 @@ public class Window {
     public DisplaySettings displaySettings;
     public long refreshRate;
 
-    private Mesh testMesh;
+    private Element[] testElements;
 
     public Window ( DisplaySettings displaySettings ) {
         this.displaySettings = displaySettings;
@@ -81,10 +82,10 @@ public class Window {
 
         // Test mesh
         float[] positions = new float[]{
-            -0.5f,  0.5f, 0.0f,
-            -0.5f, -0.5f, 0.0f,
-            0.5f, -0.5f, 0.0f,
-            0.5f,  0.5f, 0.0f,
+            -0.5f,  0.5f, -1.05f,
+            -0.5f, -0.5f, -1.05f,
+            0.5f, -0.5f, -1.05f,
+            0.5f,  0.5f, -1.05f,
         };
         int[] indices = new int[]{
             0, 1, 3, 3, 1, 2,
@@ -95,19 +96,39 @@ public class Window {
             0.0f, 0.0f, 0.5f,
             0.0f, 0.5f, 0.5f,
         };
-        this.testMesh = new Mesh( positions, indices, colors );
+        Mesh testMesh = new Mesh( positions, indices, colors );
+        Element testElement = new Element( testMesh );
+        //testElement.setX(0.5f);
+        testElement.setZ(-0.5f);
+        //testElement.setRotationY(this.testRot);
+        this.testElements = new Element[]{ testElement };
     }
 
-    public void render () {
+    public void render () throws Exception {
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-        this.renderer.render( this.testMesh );
+
+        this.renderer.render( this.testElements );
 
         glfwSwapBuffers( this.window );
         glfwPollEvents();
     }
 
+    int tickCount = 0;
+    public void tick () {
+        float testRot = (float) Math.sin((double) tickCount / 25) * 1.35f;
+        this.testElements[0].setRotationY(testRot);
+        tickCount++;
+    }
+
     public void close() {
-        this.renderer.cleanUp( this.testMesh );
+        this.renderer.cleanUp( this.testElements );
+    }
+
+    public int getWidth() {
+        return this.displaySettings.width;
+    }
+    public int getHeight() {
+        return this.displaySettings.height;
     }
 }

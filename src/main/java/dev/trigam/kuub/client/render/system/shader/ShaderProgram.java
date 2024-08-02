@@ -1,6 +1,9 @@
 package dev.trigam.kuub.client.render.system.shader;
 
-import static org.lwjgl.opengl.GL20.*;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.lwjgl.opengl.GL46.*;
 
 public class ShaderProgram {
 
@@ -8,9 +11,13 @@ public class ShaderProgram {
     private int vertexShaderId;
     private int fragmentShaderId;
 
+    private final Map< String, Integer > uniforms;
+
     public ShaderProgram () throws Exception {
         programId = glCreateProgram();
         if ( programId == 0 ) throw new Exception( "Couldn't create Shader" );
+
+        uniforms = new HashMap<>();
     }
 
     public void createVertexShader ( String shaderCode ) throws Exception {
@@ -54,6 +61,14 @@ public class ShaderProgram {
     public void cleanUp () {
         unbind();
         if ( programId != 0 ) glDeleteProgram( programId );
+    }
+
+    public int getProgramId () { return this.programId; }
+    public int getVertexShaderId () { return this.vertexShaderId; }
+    public int getFragmentShaderId () { return this.fragmentShaderId; }
+
+    public void addUniform ( Uniform uniform ) {
+        this.uniforms.put( uniform.getName(), uniform.getLocation() );
     }
 
 }

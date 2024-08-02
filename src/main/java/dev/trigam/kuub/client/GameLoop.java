@@ -28,7 +28,7 @@ public abstract class GameLoop {
         this.lastTime = System.nanoTime();
     }
 
-    public void start () {
+    public void start () throws Exception {
         this.running = true;
 
         double deltaRenderTime = 0;
@@ -88,6 +88,6 @@ public abstract class GameLoop {
     }
 
     public abstract void tick();
-    public abstract void render();
+    public abstract void render() throws Exception;
 
 }
