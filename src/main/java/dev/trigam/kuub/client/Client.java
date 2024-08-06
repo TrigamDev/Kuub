@@ -1,18 +1,22 @@
 package dev.trigam.kuub.client;
 
+import com.github.kwhat.jnativehook.GlobalScreen;
+import com.github.kwhat.jnativehook.NativeHookException;
+import dev.trigam.kuub.client.input.MouseListener;
 import dev.trigam.kuub.client.render.element.Element;
 import dev.trigam.kuub.client.render.element.Mesh;
-import dev.trigam.kuub.client.render.system.scene.Scene;
-import dev.trigam.kuub.client.render.system.window.DisplayMode;
-import dev.trigam.kuub.client.render.system.window.DisplaySettings;
-import dev.trigam.kuub.client.render.system.window.Window;
+import dev.trigam.kuub.client.render.element.MeshData;
+import dev.trigam.kuub.client.render.camera.Camera;
+import dev.trigam.kuub.client.render.scene.Scene;
+import dev.trigam.kuub.client.render.window.DisplayMode;
+import dev.trigam.kuub.client.render.window.DisplaySettings;
+import dev.trigam.kuub.client.render.window.Window;
+import dev.trigam.kuub.resource.Identifier;
+import dev.trigam.kuub.resource.texture.Texture;
 import dev.trigam.kuub.tick.Tick;
 import dev.trigam.kuub.version.GameVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class Client extends GameLoop {
     public static final Logger log = LogManager.getLogger(Client.class);
@@ -21,7 +25,10 @@ public class Client extends GameLoop {
         super( 0, Tick.TickRate );
     }
 
+    MouseListener mouseListener;
+
     Scene scene;
+    Camera camera = new Camera().setFieldOfView( 60F );
 
     public void run () throws Throwable {
         // Open window
@@ -34,68 +41,173 @@ public class Client extends GameLoop {
         this.window = new Window( displaySettings );
         this.window.open();
 
+        this.startInputListeners();
+
         this.scene = new Scene();
 
         float[] positions = new float[] {
-            -0.5f,  0.5f,  0.5f, // V1
-            -0.5f, -0.5f,  0.5f, // V2
-             0.5f, -0.5f,  0.5f, // V3
-             0.5f,  0.5f,  0.5f, // V4
-            -0.5f,  0.5f, -0.5f, // V5
-             0.5f,  0.5f, -0.5f, // V6
-            -0.5f, -0.5f, -0.5f, // V7
-             0.5f, -0.5f, -0.5f, // V8
+            // V0
+            -0.5f, 0.5f, 0.5f,
+            // V1
+            -0.5f, -0.5f, 0.5f,
+            // V2
+            0.5f, -0.5f, 0.5f,
+            // V3
+            0.5f, 0.5f, 0.5f,
+            // V4
+            -0.5f, 0.5f, -0.5f,
+            // V5
+            0.5f, 0.5f, -0.5f,
+            // V6
+            -0.5f, -0.5f, -0.5f,
+            // V7
+            0.5f, -0.5f, -0.5f,
+
+            // For text coords in top face
+            // V8: V4 repeated
+            -0.5f, 0.5f, -0.5f,
+            // V9: V5 repeated
+            0.5f, 0.5f, -0.5f,
+            // V10: V0 repeated
+            -0.5f, 0.5f, 0.5f,
+            // V11: V3 repeated
+            0.5f, 0.5f, 0.5f,
+
+            // For text coords in right face
+            // V12: V3 repeated
+            0.5f, 0.5f, 0.5f,
+            // V13: V2 repeated
+            0.5f, -0.5f, 0.5f,
+
+            // For text coords in left face
+            // V14: V0 repeated
+            -0.5f, 0.5f, 0.5f,
+            // V15: V1 repeated
+            -0.5f, -0.5f, 0.5f,
+
+            // For text coords in bottom face
+            // V16: V6 repeated
+            -0.5f, -0.5f, -0.5f,
+            // V17: V7 repeated
+            0.5f, -0.5f, -0.5f,
+            // V18: V1 repeated
+            -0.5f, -0.5f, 0.5f,
+            // V19: V2 repeated
+            0.5f, -0.5f, 0.5f,
         };
         int[] indices = new int[] {
             0, 1, 3, 3, 1, 2, // Front
-            4, 0, 3, 5, 4, 3, // Top
-            3, 2, 7, 5, 3, 7, // Right
-            6, 1, 0, 6, 0, 4, // Left
-            2, 1, 6, 2, 6, 7, // Bottom
-            7, 6, 4, 7, 4, 5, // Back
+            8, 10, 11, 9, 8, 11, // Top
+            12, 13, 7, 5, 12, 7, // Right
+            14, 15, 6, 4, 14, 6, // Left
+            16, 18, 19, 17, 16, 19, // Bottom
+            4, 6, 7, 5, 4, 7 // Back
         };
-        float[] colors = new float[]{
-            0.5f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f,
-            0.0f, 0.0f, 0.5f,
-            0.0f, 0.5f, 0.5f,
-            0.5f, 0.0f, 0.0f,
-            0.0f, 0.5f, 0.0f,
-            0.0f, 0.0f, 0.5f,
-            0.0f, 0.5f, 0.5f,
+        float[] textureCoords = new float[]{
+            0.0f, 0.0f,
+            0.0f, 0.5f,
+            0.5f, 0.5f,
+            0.5f, 0.0f,
+
+            0.0f, 0.0f,
+            0.5f, 0.0f,
+            0.0f, 0.5f,
+            0.5f, 0.5f,
+
+            // Top
+            0.0f, 0.5f,
+            0.5f, 0.5f,
+            0.0f, 1.0f,
+            0.5f, 1.0f,
+
+            // Right
+            0.0f, 0.0f,
+            0.0f, 0.5f,
+
+            // Left
+            0.5f, 0.0f,
+            0.5f, 0.5f,
+
+            // Bottom
+            0.5f, 0.0f,
+            1.0f, 0.0f,
+            0.5f, 0.5f,
+            1.0f, 0.5f,
         };
 
-        Mesh testCubeMesh = new Mesh( positions, indices, colors );
+        Texture testTexture = new Texture( new Identifier( "texture/block/deepslate.png" ) );
+
+        MeshData testCubeMeshData = new MeshData()
+            .setVertices( positions ).setIndices( indices )
+            .setTexture( testTexture ).setTextureCoords( textureCoords );
+        Mesh testCubeMesh = new Mesh( testCubeMeshData );
+
         Element testCube = new Element( testCubeMesh );
-        testCube.setX( -6f );
-        testCube.setZ( -5f );
+        testCube.setZ( -3f );
 
         this.scene.addElement( 0, testCube );
 
         this.window.setScene( this.scene );
+        this.window.setCamera( this.camera );
 
         start();
+    }
+
+    public void close () {
+        this.running = false;
+
+        this.stopInputListeners();
+        this.window.close();
+
+        System.exit( 0 );
     }
 
     int tickCount = 1;
     public void tick () {
         if ( this.window != null ) this.window.tick();
 
-        Element testCube = this.scene.getElement( tickCount - 1 ).copy();
-
-        float rotation = (float) tickCount / 75;
-        if ( rotation > 360 ) rotation = 0;
-        testCube.setRotation( 0, rotation, 0 );
-
-        testCube.setX( testCube.getPosition().x + 0.005f );
-        testCube.setY((float) Math.sin( tickCount / 5f ));
-
-        this.scene.addElement( tickCount, testCube );
+        float rotationX = (float) Math.sin( (double) tickCount / 40 ) / 2;
+        float rotationY = (float) Math.cos( (double) tickCount / 70 ) / 2;
+        this.camera.setPitch( rotationX );
+        this.camera.setYaw( rotationY );
+//        Element testCube = this.scene.getElement( 0 );
+//
+//        float rotation = (float) tickCount / 75;
+//        if ( rotation > 360 ) rotation = 0;
+//        testCube.setRotation( rotation, rotation, rotation );
+//
+//        this.scene.updateElement( tickCount, testCube );
         tickCount++;
-//        System.out.println( this.scene.getElements().size() );
     }
 
     public void render () throws Exception {
         if ( this.window != null ) this.window.render();
+    }
+
+    public void startInputListeners () {
+        try {
+            GlobalScreen.registerNativeHook();
+        } catch ( NativeHookException exception ) {
+            System.err.println("There was a problem registering the native hook.");
+            System.err.println(exception.getMessage());
+            System.exit( 1 );
+        }
+
+        this.mouseListener = new MouseListener();
+
+        GlobalScreen.addNativeMouseListener( this.mouseListener );
+        GlobalScreen.addNativeMouseMotionListener( this.mouseListener );
+    }
+    public void stopInputListeners () {
+        try {
+            GlobalScreen.unregisterNativeHook();
+        } catch ( NativeHookException exception ) {
+            System.err.println("There was a problem unregistering the native hook.");
+            System.err.println(exception.getMessage());
+            System.exit( 1 );
+        }
+
+        GlobalScreen.removeNativeMouseListener( this.mouseListener );
+        GlobalScreen.removeNativeMouseMotionListener( this.mouseListener );
     }
 }

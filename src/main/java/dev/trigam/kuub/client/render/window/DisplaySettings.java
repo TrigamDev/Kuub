@@ -1,4 +1,4 @@
-package dev.trigam.kuub.client.render.system.window;
+package dev.trigam.kuub.client.render.window;
 
 public class DisplaySettings {
 

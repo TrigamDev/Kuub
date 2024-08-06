@@ -1,4 +1,4 @@
-package dev.trigam.kuub.client.render.system.shader;
+package dev.trigam.kuub.client.render.shader;
 
 import java.util.HashMap;
 import java.util.Map;

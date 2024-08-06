@@ -1,4 +1,4 @@
-package dev.trigam.kuub.client.render.system.scene;
+package dev.trigam.kuub.client.render.scene;
 
 import dev.trigam.kuub.client.render.element.Element;
 
@@ -8,11 +8,9 @@ import java.util.Map;
 
 public class Scene {
 
-    private Map< Integer, Element > elements = new HashMap<>();
+    private final Map< Integer, Element > elements = new HashMap<>();
 
-    public Scene () {
-
-    }
+    public Scene () { }
 
     public void addElement ( int id, Element element ) {
         this.elements.put( id, element );

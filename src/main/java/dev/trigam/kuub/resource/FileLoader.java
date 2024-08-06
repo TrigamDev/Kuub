@@ -1,7 +1,5 @@
 package dev.trigam.kuub.resource;
 
-import dev.trigam.kuub.resource.Identifier;
-
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -14,12 +12,17 @@ import java.util.Optional;
 
 public class FileLoader {
 
-    public static Optional<File> loadResource ( ResourceType type, Identifier id ) throws URISyntaxException {
+    public static Optional<Path> getResourcePath ( ResourceType type, Identifier id ) throws URISyntaxException {
         Path resourcePath = Paths.get( type.getType(), id.getNamespace(), id.getPath() );
         URL resourceUrl = FileLoader.class.getClassLoader().getResource( resourcePath.toString() );
 
         if ( resourceUrl == null ) return Optional.empty();
-        return Optional.of( Paths.get( resourceUrl.toURI() ).toFile() );
+        return Optional.of( Paths.get( resourceUrl.toURI() ) );
+    }
+
+    public static Optional<File> loadResource ( ResourceType type, Identifier id ) throws URISyntaxException {
+        Optional<Path> resourcePath = getResourcePath( type, id );
+        return resourcePath.map(Path::toFile);
     }
 
     public static Optional<String> loadTextBasedResource ( ResourceType type, Identifier id ) throws URISyntaxException {

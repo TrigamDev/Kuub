@@ -1,7 +1,6 @@
 package dev.trigam.kuub.client;
 
-import dev.trigam.kuub.client.render.system.scene.Scene;
-import dev.trigam.kuub.client.render.system.window.Window;
+import dev.trigam.kuub.client.render.window.Window;
 import dev.trigam.kuub.util.Time;
 
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
@@ -9,7 +8,7 @@ import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 public abstract class GameLoop {
 
     public Window window;
-    private boolean running;
+    public boolean running;
     private final int fpsLimit; private final int tickRate;
 
     public int frameCounter; public int tickCounter;
@@ -74,7 +73,7 @@ public abstract class GameLoop {
             }
 
             if ( render ) {
-                System.out.printf("FPS: %d\nTPS: %d\n\n", this.fps, this.tps);
+                //System.out.printf("FPS: %d\nTPS: %d\n\n", this.fps, this.tps);
             }
 
             // Prevent CPU hogging

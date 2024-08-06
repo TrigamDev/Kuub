@@ -1,8 +1,11 @@
 package dev.trigam.kuub.client.render.element;
 
+import dev.trigam.kuub.resource.texture.Texture;
 import org.joml.Vector3f;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
@@ -25,6 +28,13 @@ public class Element {
     public void render () {
         glBindVertexArray( mesh.getVaoId() );
         glEnableVertexAttribArray( 0 );
+        glEnableVertexAttribArray( 1 );
+
+        // Texture
+        Texture elementTexture = this.getMesh().getTexture();
+        glActiveTexture( GL_TEXTURE0 );
+        elementTexture.bind();
+
         glDrawElements( GL_TRIANGLES, mesh.getVertexCount(), GL_UNSIGNED_INT, 0 );
     }
 

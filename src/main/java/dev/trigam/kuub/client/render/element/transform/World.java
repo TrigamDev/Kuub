@@ -13,10 +13,9 @@ public class World {
 
     public void updateWorldMatrix ( Vector3f translation, Vector3f rotation, float scale ) {
         this.worldMatrix
+            .identity()
             .translate( translation )
-            .rotateX( rotation.x )
-            .rotateY( rotation.y )
-            .rotateZ( rotation.z )
+            .rotateXYZ( rotation.x, rotation.y, rotation.z )
             .scale( scale );
     }
     public Matrix4f getWorldMatrix () { return this.worldMatrix; }

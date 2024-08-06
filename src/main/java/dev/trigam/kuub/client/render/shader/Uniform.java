@@ -1,4 +1,4 @@
-package dev.trigam.kuub.client.render.system.shader;
+package dev.trigam.kuub.client.render.shader;
 
 import org.joml.Matrix4f;
 import org.lwjgl.system.MemoryStack;
@@ -13,11 +13,16 @@ public class Uniform {
     public int location;
     public int programId;
 
-    public Uniform(int programId, String name, Matrix4f value ) {
+    public Uniform ( int programId, String name, int value ) {
         this.programId = programId; this.name = name;
-
         this.location = glGetUniformLocation( this.programId, this.name );
-        //if ( this.location < 0 ) throw new Exception( String.format( "Could not find uniform [%s] in shader program [%d]", name, this.programId ) );
+
+        glUniform1i( this.location, value );
+    }
+
+    public Uniform ( int programId, String name, Matrix4f value ) {
+        this.programId = programId; this.name = name;
+        this.location = glGetUniformLocation( this.programId, this.name );
 
         try (MemoryStack stack = MemoryStack.stackPush() ) {
             FloatBuffer buffer = stack.mallocFloat( 16 );

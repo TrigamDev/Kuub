@@ -1,9 +1,9 @@
-package dev.trigam.kuub.client.render.system.window;
+package dev.trigam.kuub.client.render.window;
 
 import dev.trigam.kuub.client.render.element.Element;
-import dev.trigam.kuub.client.render.element.Mesh;
-import dev.trigam.kuub.client.render.system.Renderer;
-import dev.trigam.kuub.client.render.system.scene.Scene;
+import dev.trigam.kuub.client.render.Renderer;
+import dev.trigam.kuub.client.render.camera.Camera;
+import dev.trigam.kuub.client.render.scene.Scene;
 import dev.trigam.kuub.color.Color;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
@@ -25,6 +25,7 @@ public class Window {
     public long refreshRate;
 
     private Scene scene;
+    private Camera camera;
 
     public Window ( DisplaySettings displaySettings ) {
         this.displaySettings = displaySettings;
@@ -69,6 +70,9 @@ public class Window {
 
         GL.createCapabilities();
 
+        this.scene = new Scene();
+        this.camera = new Camera();
+
         // Renderer
         this.renderer = new Renderer( this );
         this.renderer.init();
@@ -95,7 +99,10 @@ public class Window {
 
     public void tick () {  }
 
-    public void close() { }
+    public void close() {
+        List< Element > sceneElements = this.scene.getElements();
+        this.renderer.cleanUp( sceneElements.toArray( Element[]::new ) );
+    }
 
     public int getWidth() {
         return this.displaySettings.width;
@@ -105,4 +112,8 @@ public class Window {
     }
 
     public void setScene ( Scene scene ) { this.scene = scene; }
+    public void setCamera ( Camera camera ) { this.camera = camera; }
+
+    public Scene getScene () { return this.scene; }
+    public Camera getCamera () { return this.camera; }
 }
