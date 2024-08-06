@@ -104,9 +104,7 @@ public class Renderer {
 
     public void cleanUp ( Element[] elements ) {
         if ( this.shaderProgram != null ) this.shaderProgram.cleanUp();
-        for ( Element element : elements) {
-            element.cleanUp();
-        }
+        for ( Element element : elements) { element.cleanUp(); }
     }
 
 }
