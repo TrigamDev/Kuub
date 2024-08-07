@@ -23,6 +23,9 @@ dependencies {
     // Input
     implementation 'com.github.kwhat:jnativehook:2.2.2'
 
+    // Events
+    implementation 'com.github.jafarlihi:eemit:0.1.0'
+
     // JSON
     implementation 'org.json:json:20240303'
 

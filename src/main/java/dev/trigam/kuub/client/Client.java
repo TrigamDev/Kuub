@@ -2,7 +2,8 @@ package dev.trigam.kuub.client;
 
 import com.github.kwhat.jnativehook.GlobalScreen;
 import com.github.kwhat.jnativehook.NativeHookException;
-import dev.trigam.kuub.client.input.MouseListener;
+import dev.trigam.kuub.client.input.key.KeyListener;
+import dev.trigam.kuub.client.input.mouse.MouseListener;
 import dev.trigam.kuub.client.render.element.Element;
 import dev.trigam.kuub.client.render.element.Mesh;
 import dev.trigam.kuub.client.render.element.MeshData;
@@ -15,8 +16,13 @@ import dev.trigam.kuub.resource.Identifier;
 import dev.trigam.kuub.resource.texture.Texture;
 import dev.trigam.kuub.tick.Tick;
 import dev.trigam.kuub.version.GameVersion;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.glfw.GLFW;
+
+import java.awt.*;
+import java.awt.event.KeyEvent;
 
 public class Client extends GameLoop {
     public static final Logger log = LogManager.getLogger(Client.class);
@@ -26,9 +32,12 @@ public class Client extends GameLoop {
     }
 
     MouseListener mouseListener;
+    KeyListener keyListener;
 
     Scene scene;
-    Camera camera = new Camera().setFieldOfView( 60F );
+    Camera camera = new Camera().setY( 1f ).setFieldOfView( 60F );
+
+    private boolean cursorLocked = false;
 
     public void run () throws Throwable {
         // Open window
@@ -41,8 +50,18 @@ public class Client extends GameLoop {
         this.window = new Window( displaySettings );
         this.window.open();
 
+        // Start input
         this.startInputListeners();
+        this.initMouseControl();
 
+        this.keyListener.emitter.on( "type", ( channel, event ) -> {
+            if ( event.getRawCode() == KeyEvent.VK_ESCAPE ) {
+                if ( this.cursorLocked ) this.unlockCursor();
+                else this.lockCursor();
+            }
+        } );
+
+        // Create scene
         this.scene = new Scene();
 
         float[] positions = new float[] {
@@ -166,25 +185,35 @@ public class Client extends GameLoop {
     public void tick () {
         if ( this.window != null ) this.window.tick();
 
-        float rotationX = (float) Math.sin( (double) tickCount / 40 ) / 2;
-        float rotationY = (float) Math.cos( (double) tickCount / 70 ) / 2;
-        this.camera.setPitch( rotationX );
-        this.camera.setYaw( rotationY );
-//        Element testCube = this.scene.getElement( 0 );
-//
-//        float rotation = (float) tickCount / 75;
-//        if ( rotation > 360 ) rotation = 0;
-//        testCube.setRotation( rotation, rotation, rotation );
-//
-//        this.scene.updateElement( tickCount, testCube );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_D ) ) this.camera.setX( this.camera.getX() + 0.1f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_A ) ) this.camera.setX( this.camera.getX() - 0.1f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_W ) ) this.camera.setZ( this.camera.getZ() - 0.1f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_S ) ) this.camera.setZ( this.camera.getZ() + 0.1f );
+
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_SPACE ) ) this.camera.setY( this.camera.getY() + 0.1f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_C ) ) this.camera.setY( this.camera.getY() - 0.1f );
+
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_RIGHT ) ) this.camera.setYaw( this.camera.getYaw() + 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_LEFT ) ) this.camera.setYaw( this.camera.getYaw() - 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_UP ) ) this.camera.setPitch( this.camera.getPitch() - 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_DOWN ) ) this.camera.setPitch( this.camera.getPitch() + 0.03f );
+
         tickCount++;
     }
 
     public void render () throws Exception {
-        if ( this.window != null ) this.window.render();
+        if ( this.window != null ) {
+            this.window.render();
+
+            if ( this.cursorLocked ) {
+                int centerX = this.window.getWidth() / 2;
+                int centerY = this.window.getHeight() / 2;
+                GLFW.glfwSetCursorPos( this.window.window, centerX, centerY );
+            }
+        }
     }
 
-    public void startInputListeners () {
+    private void startInputListeners () {
         try {
             GlobalScreen.registerNativeHook();
         } catch ( NativeHookException exception ) {
@@ -194,11 +223,14 @@ public class Client extends GameLoop {
         }
 
         this.mouseListener = new MouseListener();
+        this.keyListener = new KeyListener();
 
         GlobalScreen.addNativeMouseListener( this.mouseListener );
         GlobalScreen.addNativeMouseMotionListener( this.mouseListener );
+
+        GlobalScreen.addNativeKeyListener( this.keyListener );
     }
-    public void stopInputListeners () {
+    private void stopInputListeners () {
         try {
             GlobalScreen.unregisterNativeHook();
         } catch ( NativeHookException exception ) {
@@ -209,5 +241,34 @@ public class Client extends GameLoop {
 
         GlobalScreen.removeNativeMouseListener( this.mouseListener );
         GlobalScreen.removeNativeMouseMotionListener( this.mouseListener );
+    }
+
+    private void initMouseControl () {
+        float sensitivity = 10f;
+        this.lockCursor();
+
+        this.mouseListener.emitter.on( "move", ( channel, event ) -> {
+            int centerX = this.window.getX() + ( this.window.getWidth() / 2 );
+            int centerY = this.window.getY() + ( this.window.getHeight() / 2 );
+
+            int deltaX = event.getX() - centerX;
+            int deltaY = event.getY() - centerY;
+
+            float yawChange = deltaX * ( sensitivity / 10000 );
+            float pitchChange = deltaY * ( sensitivity / 10000 );
+
+            this.camera.setYaw( this.camera.getYaw() + yawChange );
+            this.camera.setPitch( this.camera.getPitch() + pitchChange );
+        } );
+    }
+
+    public void lockCursor () {
+        this.cursorLocked = true;
+        GLFW.glfwSetInputMode( this.window.window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_HIDDEN );
+    }
+
+    public void unlockCursor () {
+        this.cursorLocked = false;
+        GLFW.glfwSetInputMode( this.window.window, GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL );
     }
 }

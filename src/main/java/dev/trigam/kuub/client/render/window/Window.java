@@ -21,6 +21,8 @@ public class Window {
     public long window;
     public Renderer renderer;
 
+    int x; int y; int width; int height;
+
     public DisplaySettings displaySettings;
     public long refreshRate;
 
@@ -39,8 +41,10 @@ public class Window {
         glfwWindowHint( GLFW_VISIBLE, GLFW_FALSE );
         glfwWindowHint( GLFW_RESIZABLE, GLFW_TRUE );
 
+        this.width = this.displaySettings.width; this.height = this.displaySettings.height;
+
         // Create window
-        this.window = glfwCreateWindow( this.displaySettings.width, this.displaySettings.height, this.displaySettings.title, NULL, NULL );
+        this.window = glfwCreateWindow( this.width, this.height, this.displaySettings.title, NULL, NULL );
         if ( this.window == NULL ) throw new RuntimeException("Failed to create the GLFW window");
 
         // Get the thread stack and push a new frame
@@ -57,10 +61,12 @@ public class Window {
 
             this.refreshRate = vidMode.refreshRate();
 
-            // If centerWindow, get monitor center, otherwise use specified position
-            int windowX = this.displaySettings.centerWindow ? ( vidMode.width() - pWidth.get(0) ) / 2 : this.displaySettings.x;
-            int windowY = this.displaySettings.centerWindow ? ( vidMode.height() - pHeight.get(0) ) / 2 : this.displaySettings.y;
-            glfwSetWindowPos( window, windowX, windowY );
+            if ( this.displaySettings.centerWindow ) {
+                this.x = ( vidMode.width() - pWidth.get( 0 ) ) / 2;
+                this.y = ( vidMode.height() - pHeight.get( 0 ) ) / 2;
+            } else { this.x = this.displaySettings.x; this.y = this.displaySettings.y; }
+
+            glfwSetWindowPos( window, this.x, this.y );
 
             glfwMakeContextCurrent( this.window );
             glfwSwapInterval(1);
@@ -99,17 +105,16 @@ public class Window {
 
     public void tick () {  }
 
-    public void close() {
+    public void close () {
         List< Element > sceneElements = this.scene.getElements();
         this.renderer.cleanUp( sceneElements.toArray( Element[]::new ) );
     }
 
-    public int getWidth() {
-        return this.displaySettings.width;
-    }
-    public int getHeight() {
-        return this.displaySettings.height;
-    }
+    public int getWidth () { return this.width; }
+    public int getHeight () { return this.height; }
+
+    public int getX () { return this.x; }
+    public int getY () { return this.y; }
 
     public void setScene ( Scene scene ) { this.scene = scene; }
     public void setCamera ( Camera camera ) { this.camera = camera; }
