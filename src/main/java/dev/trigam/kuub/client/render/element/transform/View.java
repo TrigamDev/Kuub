@@ -20,9 +20,9 @@ public class View {
     public void updateViewMatrix ( Camera camera ) {
         if ( camera != null ) {
             this.viewMatrix.identity()
-                .rotate( camera.getPitch(), xAxis )
-                .rotate( camera.getYaw(), yAxis )
-                .rotate( camera.getRoll(), zAxis )
+                .rotate( camera.getRotationX(), xAxis )
+                .rotate( camera.getRotationY(), yAxis )
+                .rotate( camera.getRotationZ(), zAxis )
                 .translate( -camera.getX(),-camera.getY(), -camera.getZ() );
         }
     }

@@ -14,7 +14,6 @@ public class KeyListener implements NativeKeyListener {
 
     public void nativeKeyPressed ( NativeKeyEvent event ) {
         this.setKeyPressed( event, true );
-        System.out.println(NativeKeyEvent.getKeyText( event.getKeyCode() ) );
         this.emitter.emit( "press", event );
     }
 

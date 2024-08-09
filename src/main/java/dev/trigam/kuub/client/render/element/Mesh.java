@@ -43,16 +43,6 @@ public class Mesh {
             glEnableVertexAttribArray( 0 );
             glVertexAttribPointer( 0, 3, GL_FLOAT, false, 0, 0 );
 
-            // Color VBO
-//            int colVboId = glGenBuffers();
-//            vboIdList.add( colVboId );
-//            FloatBuffer colorsBuffer = stack.callocFloat( meshData.length );
-//            colorsBuffer.put( 0, colors );
-//            glBindBuffer( GL_ARRAY_BUFFER, colVboId );
-//            glBufferData( GL_ARRAY_BUFFER, colorsBuffer, GL_STATIC_DRAW );
-//            glEnableVertexAttribArray( 1 );
-//            glVertexAttribPointer( 1, 3, GL_FLOAT, false, 0, 0 );
-
             // Index VBO
             int idxVboId = glGenBuffers();
             vboIdList.add( idxVboId );

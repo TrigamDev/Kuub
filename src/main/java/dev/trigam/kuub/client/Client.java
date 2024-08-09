@@ -19,9 +19,9 @@ import dev.trigam.kuub.version.GameVersion;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
-import java.awt.*;
 import java.awt.event.KeyEvent;
 
 public class Client extends GameLoop {
@@ -185,18 +185,24 @@ public class Client extends GameLoop {
     public void tick () {
         if ( this.window != null ) this.window.tick();
 
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_D ) ) this.camera.setX( this.camera.getX() + 0.1f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_A ) ) this.camera.setX( this.camera.getX() - 0.1f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_W ) ) this.camera.setZ( this.camera.getZ() - 0.1f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_S ) ) this.camera.setZ( this.camera.getZ() + 0.1f );
+        float speed = 0.1f;
 
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_SPACE ) ) this.camera.setY( this.camera.getY() + 0.1f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_C ) ) this.camera.setY( this.camera.getY() - 0.1f );
+        Vector3f moveVec = new Vector3f( 0, 0, 0 );
 
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_RIGHT ) ) this.camera.setYaw( this.camera.getYaw() + 0.03f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_LEFT ) ) this.camera.setYaw( this.camera.getYaw() - 0.03f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_UP ) ) this.camera.setPitch( this.camera.getPitch() - 0.03f );
-        if ( this.keyListener.isKeyPressed( KeyEvent.VK_DOWN ) ) this.camera.setPitch( this.camera.getPitch() + 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_D ) ) moveVec.x += speed;
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_A ) ) moveVec.x -= speed;
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_W ) ) moveVec.z -= speed;
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_S ) ) moveVec.z += speed;
+
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_SPACE ) ) moveVec.y += speed;
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_C ) ) moveVec.y -= speed;
+
+        this.camera.move( moveVec );
+
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_RIGHT ) ) this.camera.setRotationX( this.camera.getRotationX() + 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_LEFT ) ) this.camera.setRotationX( this.camera.getRotationX() - 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_UP ) ) this.camera.setRotationY( this.camera.getRotationY() - 0.03f );
+        if ( this.keyListener.isKeyPressed( KeyEvent.VK_DOWN ) ) this.camera.setRotationY( this.camera.getRotationY() + 0.03f );
 
         tickCount++;
     }
@@ -254,11 +260,11 @@ public class Client extends GameLoop {
             int deltaX = event.getX() - centerX;
             int deltaY = event.getY() - centerY;
 
-            float yawChange = deltaX * ( sensitivity / 10000 );
-            float pitchChange = deltaY * ( sensitivity / 10000 );
+            float rotationXChange = deltaX * ( sensitivity / 10000 );
+            float rotationYChange = deltaY * ( sensitivity / 10000 );
 
-            this.camera.setYaw( this.camera.getYaw() + yawChange );
-            this.camera.setPitch( this.camera.getPitch() + pitchChange );
+            this.camera.setRotationX( this.camera.getRotationX() + rotationYChange );
+            this.camera.setRotationY( this.camera.getRotationY() + rotationXChange );
         } );
     }
 
