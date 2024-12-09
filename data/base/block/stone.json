@@ -1,0 +1,23 @@
+{
+	"id": "stone",
+
+	"components": {
+		"asset_id": "base:block/stone",
+
+		"hardness": 1.5,
+		"blast_resistance": 6,
+		"preferred_tool_type": "base:pickaxe",
+
+		"solid": true,
+		"collidable": true,
+		"flammability": 0,
+		"friction": 1,
+		"velocity_multiplier": 1,
+		"light": [ 0, 0, 0 ],
+
+		"suffocates": true,
+		"replaceable": false,
+
+		"opaque": true
+	}
+}

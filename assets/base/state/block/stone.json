@@ -1,0 +1,13 @@
+{
+	"variants": [
+		{
+			"model": "base:block/stone"
+		},
+		{
+			"model": "base:block/stone_snowy",
+			"when": {
+				"snowy": true
+			}
+		}
+	]
+}

@@ -1,0 +1,10 @@
+{
+	"parent": "block/template/block_mesh",
+
+	"textures": {
+		"stone": {
+			"resource_location": "texture/block/stone",
+			"size":	{	"x": 16,	"y": 16	}
+		}
+	}
+}
